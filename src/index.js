@@ -1,15 +1,29 @@
+// Package
 import express from "express";
-import dotenv from "dotenv";
 import mongoose from "mongoose";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+
+// Route
 import Auth from "./routes/Auth.js";
 import User from "./routes/User.js";
-import Mall from "./routes/Mall.js";
+import Outlet from "./routes/Outlet.js";
+import CategoryOutlet from "./routes/CategoryOutlet.js";
+import CategoryProduct from "./routes/CategoryProduct.js";
+
+// Middleware
 import { tokenVerify } from "./middleware/tokenVerify.js";
 
+// Declare
+const _filename = fileURLToPath(import.meta.url);
+const _dirname = dirname(_filename);
 const app = express();
+const images_dir = path.join(_dirname, "..", "public/images");
 dotenv.config();
 
+// Database
 mongoose
   .connect("mongodb://127.0.0.1/marketplace")
   .then((result) => {
@@ -25,7 +39,10 @@ app.use(cookieParser());
 
 app.use("/auth", Auth);
 app.use("/user", User);
-app.use("/mall", Mall);
+app.use("/outlet", Outlet);
+app.use("/category-product", CategoryProduct);
+app.use("/category-outlet", CategoryOutlet);
+app.use("/files", express.static(images_dir));
 
 app.get("/", tokenVerify, (req, res) => {
   res.status(200).json({

@@ -84,7 +84,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await User.findByIdAndDelete(id);
+    const result = await User.findByIdAndUpdate(id, { deleted_at: new Date() });
     res.status(200).json({
       status: 200,
       message: `User by id: ${id} has been deleted!`,

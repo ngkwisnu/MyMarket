@@ -20,16 +20,8 @@ const outletSchema = new mongoose.Schema(
       enum: ["active", "non-active"],
     },
     outlet_category: {
-      type: String,
-      required: true,
-      enum: [
-        "Fashion",
-        "Electronics",
-        "Home & Living",
-        "Health & Beauty",
-        "Toys & Hobbies",
-        "Groceries",
-      ],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CategoryOutlet",
     },
     deleted_at: {
       type: Date,
@@ -38,10 +30,6 @@ const outletSchema = new mongoose.Schema(
     products: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
-    },
-    mall: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Mall",
     },
   },
   { timestamps: true }

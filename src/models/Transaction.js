@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const transactionSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   transaction_date: {
     type: Date,
     required: true,
@@ -15,6 +19,10 @@ const transactionSchema = new mongoose.Schema({
   },
   products: [
     {
+      product_id: {
+        type: String,
+        required: true,
+      },
       product_title: {
         type: String,
         required: true,
@@ -34,33 +42,21 @@ const transactionSchema = new mongoose.Schema({
       product_category: {
         type: String,
         required: true,
-        enum: [
-          "Furniture",
-          "decor",
-          "kitchenware",
-          "Accessories",
-          "Clothing",
-          "Pants",
-          "Shoes",
-          "Bags",
-          "Jackets",
-          "Toys",
-          "collectibles",
-          "games",
-          "Food",
-          "beverages",
-        ],
       },
-      product_outlet: {
-        type: String,
-        required: true,
-      },
-      product_quantity: {
+      total_price: {
         type: Number,
         required: true,
       },
     },
   ],
+  product_outlet: {
+    type: String,
+    required: true,
+  },
+  total_amount: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema);

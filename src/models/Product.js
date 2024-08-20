@@ -19,24 +19,8 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     product_category: {
-      type: String,
-      required: true,
-      enum: [
-        "Furniture",
-        "decor",
-        "kitchenware",
-        "Accessories",
-        "Clothing",
-        "Pants",
-        "Shoes",
-        "Bags",
-        "Jackets",
-        "Toys",
-        "collectibles",
-        "games",
-        "Food",
-        "beverages",
-      ],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CategoryProduct",
     },
     product_status: {
       type: String,
@@ -51,18 +35,6 @@ const productSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    likes: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    favorite: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
     outlet: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Outlet",
