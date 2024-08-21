@@ -57,6 +57,18 @@ const transactionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  deleted_at: {
+    type: Date,
+    default: null,
+  },
+});
+
+transactionSchema.pre("find", function () {
+  this.where({ deleted_at: null });
+});
+
+transactionSchema.pre("findOne", function () {
+  this.where({ deleted_at: null });
 });
 
 const Transaction = mongoose.model("Transaction", transactionSchema);

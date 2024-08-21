@@ -5,12 +5,10 @@ const favoriteSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  products: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-    },
-  ],
+  products: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+  },
 });
 
 const Favorites = mongoose.model("Favorite", favoriteSchema);

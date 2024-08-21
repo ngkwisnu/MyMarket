@@ -35,6 +35,14 @@ const outletSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+outletSchema.pre("find", function () {
+  this.where({ deleted_at: null });
+});
+
+outletSchema.pre("findOne", function () {
+  this.where({ deleted_at: null });
+});
+
 const Outlet = mongoose.model("Outlet", outletSchema);
 
 export default Outlet;

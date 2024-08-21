@@ -12,6 +12,9 @@ import User from "./routes/User.js";
 import Outlet from "./routes/Outlet.js";
 import CategoryOutlet from "./routes/CategoryOutlet.js";
 import CategoryProduct from "./routes/CategoryProduct.js";
+import Product from "./routes/Product.js";
+import Order from "./routes/Order.js";
+import Cart from "./routes/Cart.js";
 
 // Middleware
 import { tokenVerify } from "./middleware/tokenVerify.js";
@@ -40,6 +43,9 @@ app.use(cookieParser());
 app.use("/auth", Auth);
 app.use("/user", User);
 app.use("/outlet", Outlet);
+app.use("/product", Product);
+app.use("/order", Order);
+app.use("/cart", Cart);
 app.use("/category-product", CategoryProduct);
 app.use("/category-outlet", CategoryOutlet);
 app.use("/files", express.static(images_dir));

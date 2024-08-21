@@ -14,6 +14,14 @@ const categoryOutletSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+categoryOutletSchema.pre("find", function () {
+  this.where({ deleted_at: null });
+});
+
+categoryOutletSchema.pre("findOne", function () {
+  this.where({ deleted_at: null });
+});
+
 const CategoryOutlet = mongoose.model("CategoryOutlet", categoryOutletSchema);
 
 export default CategoryOutlet;

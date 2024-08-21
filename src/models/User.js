@@ -55,6 +55,14 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.pre("find", function () {
+  this.where({ deleted_at: null });
+});
+
+userSchema.pre("findOne", function () {
+  this.where({ deleted_at: null });
+});
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

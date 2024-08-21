@@ -14,6 +14,14 @@ const categoryProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+categoryProductSchema.pre("find", function () {
+  this.where({ deleted_at: null });
+});
+
+categoryProductSchema.pre("findOne", function () {
+  this.where({ deleted_at: null });
+});
+
 const CategoryProduct = mongoose.model(
   "CategoryProduct",
   categoryProductSchema

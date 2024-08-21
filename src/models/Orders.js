@@ -23,19 +23,51 @@ const orderSchema = new mongoose.Schema({
   },
   products: [
     {
-      product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+      product_id: {
+        type: String,
+        required: true,
+      },
+      product_title: {
+        type: String,
+        required: true,
+      },
+      product_price: {
+        type: Number,
+        required: true,
+      },
+      product_description: {
+        type: String,
+        required: true,
+      },
+      product_image: {
+        type: String,
+        required: true,
+      },
+      product_category: {
+        type: String,
+        required: true,
+      },
+      total_price: {
+        type: Number,
+        required: true,
       },
       qty: {
         type: Number,
         required: true,
+      },
+      outlet: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Outlet",
       },
     },
   ],
   total_amount: {
     type: Number,
     required: true,
+  },
+  deleted_at: {
+    type: Date,
+    default: null,
   },
 });
 
