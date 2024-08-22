@@ -15,6 +15,11 @@ import CategoryProduct from "./routes/CategoryProduct.js";
 import Product from "./routes/Product.js";
 import Order from "./routes/Order.js";
 import Cart from "./routes/Cart.js";
+import Favorites from "./routes/Favorites.js";
+import Likes from "./routes/Likes.js";
+import Rates from "./routes/Rates.js";
+import GroupCategory from "./routes/GroupCategory.js";
+import Transaction from "./routes/Transaction.js";
 
 // Middleware
 import { tokenVerify } from "./middleware/tokenVerify.js";
@@ -45,9 +50,15 @@ app.use("/user", User);
 app.use("/outlet", Outlet);
 app.use("/product", Product);
 app.use("/order", Order);
-app.use("/cart", Cart);
+// app.use("/cart", Cart);
+app.use("/likes", Likes);
+app.use("/favorites", Favorites);
+app.use("/transaction", Transaction);
+app.use("/rates", Rates);
+app.use("/group-category", GroupCategory);
 app.use("/category-product", CategoryProduct);
 app.use("/category-outlet", CategoryOutlet);
+
 app.use("/files", express.static(images_dir));
 
 app.get("/", tokenVerify, (req, res) => {

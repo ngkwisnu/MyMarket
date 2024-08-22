@@ -17,14 +17,14 @@ const allCart = async (req, res) => {
   }
 };
 
-const cartById = async (req, res) => {
+const cartByUser = async (req, res) => {
   try {
-    if (req.params.id) return res.sendStatus(404);
-    const cart = await Cart.findById(req.params.id);
+    if (req.user.id) return res.sendStatus(404);
+    const cart = await Cart.findOne({ user: req.user.id });
     if (!cart) return res.sendStatus(404);
     return res.status(200).json({
       status: 200,
-      message: "Get cart by id successfully!",
+      message: "Get cart by user successfully!",
       data: cart,
     });
   } catch (error) {
@@ -92,4 +92,4 @@ const deleteCart = async (req, res) => {
   }
 };
 
-export default { allCart, addCart, cartById, updateCart, deleteCart };
+export default { allCart, addCart, cartByUser, updateCart, deleteCart };

@@ -12,7 +12,7 @@ const register = async (req, res) => {
     password = await bcrypt.hash(password, 12);
     const user = new User({
       username: username,
-      password: password,
+      id: id,
       email: email,
     });
     const result = await user.save();
@@ -37,8 +37,8 @@ const login = async (req, res) => {
   const result = bcrypt.compare(password, user.password);
   if (result) {
     const payload = {
+      id: user.id,
       username: user.username,
-      password: user.password,
       email: user.email,
     };
     const access_key = jwt.sign(payload, process.env.ACCESS_KEY_SECRET, {
@@ -68,23 +68,28 @@ const refreshToken = async (req, res) => {
   const user = await User.findOne({ refresh_token: refresh_key });
   const payload = {
     username: user.username,
-    password: user.password,
+    id: user.id,
     email: user.email,
   };
-  console.log(refresh_key);
   jwt.verify(
     refresh_key,
     process.env.REFRESH_KEY_SECRET,
     function (err, decode) {
       if (err) return res.sendStatus(403);
       const access_key = jwt.sign(payload, process.env.ACCESS_KEY_SECRET, {
+        expiresIn: "40s",
+      });
+      const refresh_key = jwt.sign(payload, process.env.REFRESH_KEY_SECRET, {
         expiresIn: "1d",
       });
-      return res.status(200).json({
-        status: 200,
-        message: "Get token",
-        token: access_key,
-      });
+      return res
+        .status(200)
+        .cookie("refresh_token", refresh_key)
+        .json({
+          status: 200,
+          message: "Get token",
+          token: `Bearer ${access_key}`,
+        });
     }
   );
 };

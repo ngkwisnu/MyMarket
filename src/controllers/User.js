@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 
 const allUser = async (req, res) => {
   try {
+    console.log(req.user);
     const user = await User.find({});
     if (!user) return res.sendStatus(400);
     res.status(200).json({

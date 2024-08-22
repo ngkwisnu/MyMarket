@@ -7,6 +7,7 @@ export const tokenVerify = async (req, res, next) => {
   console.log(token);
   jwt.verify(token, process.env.ACCESS_KEY_SECRET, function (err, decode) {
     if (err) return res.sendStatus(401);
+    req.user = decode;
     return next();
   });
 };
