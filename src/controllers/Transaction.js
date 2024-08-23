@@ -37,6 +37,28 @@ const transactionById = async (req, res) => {
   }
 };
 
+const transactionByUser = async (req, res) => {
+  const { id } = req.user;
+  const transaction = await Transaction.findOne({ user: id });
+  return res.status(200).json({
+    status: true,
+    message: "Success get transaction by user",
+    data: order,
+  });
+};
+
+const transactionByProduct = async (req, res) => {
+  const { id } = req.params;
+  const productInTransaction = await Transaction.find({
+    products: { $in: id },
+  });
+  return res.status(200).json({
+    status: 200,
+    message: "Successfully to get data product in Transaction",
+    data: productInTransaction,
+  });
+};
+
 const addTransaction = async (req, res) => {
   try {
     const Transaction = new Transaction(req.body);
@@ -100,4 +122,6 @@ export default {
   transactionById,
   updateTransaction,
   deleteTransaction,
+  transactionByUser,
+  transactionByProduct,
 };

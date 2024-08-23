@@ -7,7 +7,7 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["success", "failed"],
+    enum: ["success", "waiting", "failed"],
   },
   transaction_date: {
     type: Date,

@@ -27,10 +27,12 @@ const outletSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    products: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-    },
+    products: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   { timestamps: true }
 );
