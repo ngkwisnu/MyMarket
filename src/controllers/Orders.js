@@ -1,7 +1,9 @@
 import Order from "../models/Orders.js";
 import Product from "../models/Product.js";
+import Outlet from "../models/Outlet.js";
 import User from "../models/User.js";
 import midtransClient from "../../node_modules/midtrans-client/index.js";
+import Transaction from "../models/Transaction.js";
 
 let snap = new midtransClient.Snap({
   isProduction: false,
@@ -10,39 +12,54 @@ let snap = new midtransClient.Snap({
 });
 
 const dataMidtrans = async (req, res) => {
-  console.log(req);
-};
+  const result = await snap.transaction.notification(req.body);
+  if (result.transaction_status !== "capture") {
+    await Order.findByIdAndUpdate(result.order_id, {
+      status: result.transaction_status,
+    });
+    return res.status(400).json({
+      status: false,
+      message: result.status_message,
+    });
+  } else {
+    const order = await Order.findById(result.order_id).populate("products");
+    const outlet_id = [];
+    order.products.forEach((el) => {
+      const outletIds = String(el.outlet);
+      if (!outlet_id.includes(outletIds)) {
+        outlet_id.push(outletIds);
+      }
+    });
+    // console.log(outlet_id);
 
-const checkout = async (req, res) => {
-  const { id } = req.params;
-  const { qty } = req.body;
-  const product = await Product.findById(id);
-  const user = await User.findById(req.user.id);
-  const params = {
-    item_details: [
-      {
-        id: id,
-        price: Math.round(product.product_price),
-        quantity: qty,
-        name: product.product_title,
-        category: product.product_category,
-        merchant_name: product.outlet,
+    console.log(order.products);
+    const productOutlet = await Product.find({
+      outlet: { $in: outlet_id },
+    }).populate("outlet");
+
+    const transaction = new Transaction({
+      user: order.user,
+      order_id: result.order_id,
+      transaction_date: result.transaction_time,
+      address: order.address,
+      payment_method: result.payment_type,
+      products: order.products,
+      outlet: productOutlet[0].outlet.outlet_name,
+      total_amount: {
+        type: Number,
+        required: true,
       },
-    ],
-    customer_details: {
-      first_name: user.firstname,
-      last_name: user.lastname,
-      email: user.email,
-      phone: user.phone,
-      address: user.address,
-    },
-    transaction_details: {
-      order_id: "09LK",
-      gross_amount: Math.round(product.product_price * qty),
-    },
-  };
-  const token = await snap.createTransactionToken(params);
-  res.send(token);
+      deleted_at: {
+        type: Date,
+        default: null,
+      },
+    });
+    await transaction.save();
+    return res.status(200).json({
+      status: 200,
+      message: "Berhasil melakukan pembelian!",
+    });
+  }
 };
 
 const allOrder = async (req, res) => {
@@ -105,50 +122,24 @@ const orderByProduct = async (req, res) => {
 const addOrder = async (req, res) => {
   try {
     const { address, payment_method, products } = req.body;
-    const idprod = [];
-    products.map((el) => {
-      idprod.push(el.product_id);
-    });
-    const product = await Product.find({ _id: { $in: idprod } }).len();
+    const idprod = products.map((el) => el.product_id);
+    const product = await Product.find({ _id: { $in: idprod } })
+      .populate("outlet")
+      .populate("product_category");
 
-    const uu = product.map((element) => {
-      // console.log(element.id);
-      products.map((el) => {
-        if (el.product_id == element._id) {
-          element.qty = el.qty;
-          // console.log(element.qty);
-        }
-      });
-      return element;
-    });
+    const detailsprod = product.map((prod, index) => ({
+      product_id: prod._id,
+      product_title: prod.product_title,
+      product_price: Math.round(prod.product_price),
+      product_description: prod.product_description,
+      product_image: prod.product_image,
+      product_category: prod.product_category._id,
+      qty: products[index].qty,
+      total_price: Math.round(prod.product_price * products[index].qty),
+      outlet: prod.outlet._id,
+    }));
 
-    console.log(uu);
-    // console.log(product);
-    // const detailsprod = [];
-    // product.map((prod) => {
-    //   detailsprod.push({
-    //     product_id: prod._id,
-    //     product_title: prod.product_title,
-    //     product_price: prod.product_price,
-    //     product_description: prod.product_description,
-    //     product_image: prod.product_image,
-    //     product_category: prod.product_category,
-    //     total_price: prod.product_price * qty,
-    //     outlet: prod.outlet,
-    //   });
-    // });
-    // console.log(detailsprod);
-    // const {
-    //   product_title,
-    //   product_description,
-    //   product_price,
-    //   product_image,
-    //   product_category,
-    //   outlet,
-    // } = product;
-    // const total_price = product_price * qty;
-    // const total_amount = 0;
-    // const products = [];
+    const total_amount = detailsprod.reduce((sum, i) => sum + i.total_price, 0);
 
     const order = new Order({
       user: req.user.id,
@@ -156,29 +147,28 @@ const addOrder = async (req, res) => {
       transaction_date: new Date(),
       address: address,
       payment_method: payment_method,
-      products: [],
-      total_amount: total_amount,
+      products: detailsprod,
+      total_amount: Math.round(total_amount),
     });
+
+    const items = product.map((el, i) => ({
+      id: el._id,
+      price: Math.round(el.product_price),
+      quantity: products[i].qty,
+      name: el.product_title,
+      category: el.product_category.category_name,
+      merchant_name: el.outlet.outlet_name,
+    }));
 
     if (!order) return res.sendStatus(404);
     const user = await User.findById(req.user.id);
+
     const params = {
-      item_details: [
-        {
-          id: id,
-          price: Math.round(product.product_price),
-          quantity: qty,
-          name: product.product_title,
-          category: product.product_category,
-          merchant_name: product.outlet,
-        },
-      ],
+      item_details: items,
       customer_details: {
-        first_name: user.firstname,
-        last_name: user.lastname,
+        first_name: user.username,
+        last_name: user.username,
         email: user.email,
-        phone: user.phone,
-        address: user.address,
       },
       transaction_details: {
         order_id: order.id,
@@ -186,16 +176,22 @@ const addOrder = async (req, res) => {
       },
     };
 
-    const result = await order.save();
+    console.log(params);
 
-    const token = await snap.createTransaction(params);
-    if (!result) return res.sendStatus(400);
-    return res.status(200).json({
-      status: 200,
-      data: {
-        token: token,
-      },
-    });
+    const result = await order.save();
+    snap
+      .createTransaction(params)
+      .then((transaction) => {
+        return res.status(200).json({
+          status: 200,
+          data: {
+            token: transaction,
+          },
+        });
+      })
+      .catch((e) => {
+        console.log("Error occured:", e.message);
+      });
   } catch (error) {
     return res.status(500).json({
       status: 500,
@@ -250,6 +246,5 @@ export default {
   deleteOrder,
   orderByProduct,
   orderByUser,
-  checkout,
   dataMidtrans,
 };
