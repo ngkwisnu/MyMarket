@@ -12,6 +12,7 @@ let snap = new midtransClient.Snap({
 });
 
 const dataMidtrans = async (req, res) => {
+  console.log("Masuk");
   const result = await snap.transaction.notification(req.body);
   if (result.transaction_status !== "capture") {
     await Order.findByIdAndUpdate(result.order_id, {
@@ -30,31 +31,46 @@ const dataMidtrans = async (req, res) => {
         outlet_id.push(outletIds);
       }
     });
-    // console.log(outlet_id);
 
-    console.log(order.products);
-    const productOutlet = await Product.find({
-      outlet: { $in: outlet_id },
-    }).populate("outlet");
-
-    const transaction = new Transaction({
-      user: order.user,
-      order_id: result.order_id,
-      transaction_date: result.transaction_time,
-      address: order.address,
-      payment_method: result.payment_type,
-      products: order.products,
-      outlet: productOutlet[0].outlet.outlet_name,
-      total_amount: {
-        type: Number,
-        required: true,
-      },
-      deleted_at: {
-        type: Date,
-        default: null,
-      },
+    outlet_id.forEach(async (el) => {
+      let arr = [];
+      order.products.forEach((poutlet) => {
+        if (el == poutlet.outlet) {
+          arr.push(poutlet);
+        }
+      });
+      const transaction = new Transaction({
+        user: order.user,
+        order_id: result.order_id,
+        transaction_date: result.transaction_time,
+        address: order.address,
+        payment_method: result.payment_type,
+        products: arr,
+        outlet: el,
+        total_amount: order.total_amount,
+      });
+      await transaction.save();
+      arr = [];
     });
-    await transaction.save();
+
+    // const transaction = new Transaction({
+    //   user: order.user,
+    //   order_id: result.order_id,
+    //   transaction_date: result.transaction_time,
+    //   address: order.address,
+    //   payment_method: result.payment_type,
+    //   products: order.products,
+    //   outlet: outletObj[0].outlet.outlet_name,
+    //   total_amount: {
+    //     type: Number,
+    //     required: true,
+    //   },
+    //   deleted_at: {
+    //     type: Date,
+    //     default: null,
+    //   },
+    // });
+    // await transaction.save();
     return res.status(200).json({
       status: 200,
       message: "Berhasil melakukan pembelian!",

@@ -47,7 +47,7 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      product_qty: {
+      qty: {
         type: Number,
         required: true,
       },
