@@ -1,17 +1,16 @@
 import Order from "../models/Orders.js";
 import Product from "../models/Product.js";
-import Outlet from "../models/Outlet.js";
 import User from "../models/User.js";
 import midtransClient from "../../node_modules/midtrans-client/index.js";
 import Transaction from "../models/Transaction.js";
 
 let snap = new midtransClient.Snap({
   isProduction: false,
-  serverKey: "SB-Mid-server-uUZatK0dRb9vrdKmFzSDJnJ0",
-  clientKey: "SB-Mid-client-1OGYS8MQOJdhggpp",
+  serverKey: process.env.SERVER_KEY,
+  clientKey: process.env.CLIENT_KEY,
 });
 
-const dataMidtrans = async (req, res) => {
+const insertTransaction = async (req, res) => {
   console.log("Masuk");
   const result = await snap.transaction.notification(req.body);
   if (result.transaction_status !== "capture") {
@@ -52,25 +51,6 @@ const dataMidtrans = async (req, res) => {
       await transaction.save();
       arr = [];
     });
-
-    // const transaction = new Transaction({
-    //   user: order.user,
-    //   order_id: result.order_id,
-    //   transaction_date: result.transaction_time,
-    //   address: order.address,
-    //   payment_method: result.payment_type,
-    //   products: order.products,
-    //   outlet: outletObj[0].outlet.outlet_name,
-    //   total_amount: {
-    //     type: Number,
-    //     required: true,
-    //   },
-    //   deleted_at: {
-    //     type: Date,
-    //     default: null,
-    //   },
-    // });
-    // await transaction.save();
     return res.status(200).json({
       status: 200,
       message: "Berhasil melakukan pembelian!",
@@ -262,5 +242,5 @@ export default {
   deleteOrder,
   orderByProduct,
   orderByUser,
-  dataMidtrans,
+  insertTransaction,
 };

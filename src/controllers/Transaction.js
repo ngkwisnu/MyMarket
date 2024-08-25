@@ -59,42 +59,17 @@ const transactionByProduct = async (req, res) => {
   });
 };
 
-// const addTransaction = async (req, res) => {
-//   try {
-//     const Transaction = new Transaction(req.body);
-//     if (!Transaction) return res.sendStatus(404);
-//     const result = await Transaction.save();
-//     if (!result) return res.sendStatus(400);
-//     return res.status(200).json({
-//       status: 200,
-//       message: "Create Transaction data success!",
-//       data: Transaction,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       status: 500,
-//       message: error,
-//     });
-//   }
-// };
-
-// const updateTransaction = async (req, res) => {
-//   try {
-//     if (!req.params.id) return res.sendStatus(404);
-//     const result = await Transaction.findByIdAndUpdate(req.params.id, req.body);
-//     if (!result) return res.sendStatus(400);
-//     return res.status(200).json({
-//       status: 200,
-//       message: "Update Transaction successfully!",
-//       data: req.body,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       status: 500,
-//       message: error,
-//     });
-//   }
-// };
+const transactionByOutlet = async (req, res) => {
+  const { id } = req.params;
+  const tranckingTransaction = await Transaction.find({
+    outlet: id,
+  });
+  return res.status(200).json({
+    status: 200,
+    message: "Successfully to get data transaction by outlet",
+    data: productInTransaction,
+  });
+};
 
 const deleteTransaction = async (req, res) => {
   try {
@@ -122,4 +97,5 @@ export default {
   deleteTransaction,
   transactionByUser,
   transactionByProduct,
+  transactionByOutlet,
 };

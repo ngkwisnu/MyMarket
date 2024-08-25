@@ -11,6 +11,6 @@ router.put("/:id", Orders.updateOrder);
 router.delete("/:id", Orders.deleteOrder);
 router.get("/:id", Orders.orderById);
 router.get("/product/:id", Orders.orderByProduct);
-router.post("/data/midtrans", Orders.dataMidtrans);
+router.post("/data/midtrans", Orders.insertTransaction);
 
 export default router;
