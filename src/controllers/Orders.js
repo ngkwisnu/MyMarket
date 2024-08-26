@@ -1,6 +1,7 @@
 import Order from "../models/Orders.js";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import Cart from "../models/Cart.js";
 import midtransClient from "../../node_modules/midtrans-client/index.js";
 import Transaction from "../models/Transaction.js";
 
@@ -12,12 +13,12 @@ let snap = new midtransClient.Snap({
 
 const insertTransaction = async (req, res) => {
   console.log("Transactions Load!");
-  const result = await snap.transaction.notification(req.body);
+  // const result = await snap.transaction.notification(req.body);
+  const result = req.body;
   if (result.transaction_status !== "capture") {
-    const order = await Order.findByIdAndUpdate(result.order_id, {
+    await Order.findByIdAndUpdate(result.order_id, {
       status: result.transaction_status,
     });
-    await order.save();
     return res.status(400).json({
       status: false,
       message: result.status_message,
@@ -123,6 +124,8 @@ const addOrder = async (req, res) => {
   try {
     const { address, products } = req.body;
     const idprod = products.map((el) => el.product_id);
+    console.log(req.body);
+
     const product = await Product.find({ _id: { $in: idprod } })
       .populate("outlet")
       .populate("product_category");
@@ -140,6 +143,7 @@ const addOrder = async (req, res) => {
     }));
 
     const total_amount = detailsprod.reduce((sum, i) => sum + i.total_price, 0);
+    console.log(total_amount);
 
     const order = new Order({
       user: req.user.id,
@@ -175,9 +179,8 @@ const addOrder = async (req, res) => {
       },
     };
 
-    console.log(params);
-
-    const result = await order.save();
+    await order.save();
+    await Cart.findOneAndDelete({ user: order.user });
     snap
       .createTransaction(params)
       .then((transaction) => {
@@ -194,7 +197,7 @@ const addOrder = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: 500,
-      message: error,
+      message: error.message,
     });
   }
 };

@@ -7,7 +7,7 @@ const router = express.Router();
 const middleware = [tokenVerify, validateForm.validateFormCart];
 
 router.get("/", tokenVerify, Cart.allCart);
-router.post("/", middleware, Cart.addItemToCart);
+router.post("/", tokenVerify, Cart.addItemToCart);
 router.get("/:id", tokenVerify, Cart.cartByUser);
 router.get("/product/:id", tokenVerify, Cart.findProductInCart);
 router.put("/:id", middleware, Cart.updateCart);

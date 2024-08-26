@@ -49,9 +49,9 @@ const addItemToCart = async (req, res) => {
         data: cart,
       });
     } else {
-      const [products] = req.body;
+      const { products } = req.body;
       const cart = await Cart.findOne({ user: req.user.id });
-      cart.products.push(product);
+      cart.products.push(...products);
       await cart.save();
       return res.status(200).json({
         status: true,
@@ -62,7 +62,7 @@ const addItemToCart = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: 500,
-      message: error,
+      message: error.message,
     });
   }
 };
