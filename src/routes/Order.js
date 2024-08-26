@@ -1,12 +1,17 @@
 import express from "express";
 import Orders from "../controllers/Orders.js";
+import { tokenVerify } from "../middleware/tokenVerify.js";
+import validateForm from "../middleware/validateForm.js";
 
 const router = express.Router();
 
-router.get("/", Orders.allOrder);
-router.post("/", Orders.addOrder);
-router.put("/:id", Orders.updateOrder);
-router.delete("/:id", Orders.deleteOrder);
-router.get("/:id", Orders.orderById);
+router.get("/", tokenVerify, Orders.allOrder);
+router.get("/user/", tokenVerify, Orders.orderByUser);
+router.post("/", tokenVerify, Orders.addOrder);
+router.put("/:id", tokenVerify, Orders.updateOrder);
+router.delete("/:id", tokenVerify, Orders.deleteOrder);
+router.get("/:id", tokenVerify, Orders.orderById);
+router.get("/product/:id", tokenVerify, Orders.orderByProduct);
+router.post("/data/midtrans", Orders.insertTransaction);
 
 export default router;

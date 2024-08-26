@@ -42,10 +42,10 @@ const login = async (req, res) => {
       email: user.email,
     };
     const access_key = jwt.sign(payload, process.env.ACCESS_KEY_SECRET, {
-      expiresIn: "40s",
+      expiresIn: "1d",
     });
     const refresh_key = jwt.sign(payload, process.env.REFRESH_KEY_SECRET, {
-      expiresIn: "1d",
+      expiresIn: "7d",
     });
     await User.findByIdAndUpdate(user.id, { refresh_token: refresh_key });
     return res
@@ -77,10 +77,10 @@ const refreshToken = async (req, res) => {
     function (err, decode) {
       if (err) return res.sendStatus(403);
       const access_key = jwt.sign(payload, process.env.ACCESS_KEY_SECRET, {
-        expiresIn: "40s",
+        expiresIn: "1d",
       });
       const refresh_key = jwt.sign(payload, process.env.REFRESH_KEY_SECRET, {
-        expiresIn: "1d",
+        expiresIn: "7d",
       });
       return res
         .status(200)

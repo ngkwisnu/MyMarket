@@ -42,8 +42,9 @@ const addUser = async (req, res) => {
   try {
     const user = new User(req.body);
     if (!user) return res.sendStatus(400);
-    user.image = `${req.file.filename}${req.file.originalname}`;
-    console.log(user);
+    user.image = `${req.file.filename}`;
+    console.log(req.file);
+    // console.log(req);
     if (!user.password) return res.sendStatus(400);
     user.password = await bcrypt.hash(user.password, 12);
     await user.save();

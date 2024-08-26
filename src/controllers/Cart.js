@@ -35,21 +35,34 @@ const cartByUser = async (req, res) => {
   }
 };
 
-const addCart = async (req, res) => {
+const addItemToCart = async (req, res) => {
   try {
-    const cart = new Cart(req.body);
-    if (!cart) return res.sendStatus(404);
-    const result = await cart.save();
-    if (!result) return res.sendStatus(400);
-    return res.status(200).json({
-      status: 200,
-      message: "Add cart successfully!",
-      data: cart,
-    });
+    const cartUser = await Cart.findOne({ user: req.user.id });
+    if (!cartUser) {
+      const cart = new Cart(req.body);
+      if (!cart) return res.sendStatus(404);
+      const result = await cart.save();
+      if (!result) return res.sendStatus(400);
+      return res.status(200).json({
+        status: 200,
+        message: "Add cart successfully!",
+        data: cart,
+      });
+    } else {
+      const { products } = req.body;
+      const cart = await Cart.findOne({ user: req.user.id });
+      cart.products.push(...products);
+      await cart.save();
+      return res.status(200).json({
+        status: true,
+        message: "Success add product to cart!",
+        data: products,
+      });
+    }
   } catch (error) {
     return res.status(500).json({
       status: 500,
-      message: error,
+      message: error.message,
     });
   }
 };
@@ -72,24 +85,24 @@ const updateCart = async (req, res) => {
   }
 };
 
-const deleteCart = async (req, res) => {
-  try {
-    if (!req.params.id) return res.sendStatus(404);
-    const result = await Cart.findByIdAndUpdate(req.params.id, {
-      deleted_at: new Date(),
-    });
-    if (!result) return res.sendStatus(400);
-    return res.status(200).json({
-      status: 200,
-      message: "Cart has been deleted!",
-      data: result,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      message: error,
-    });
-  }
+const findProductInCart = async (req, res) => {
+  const { id } = req.params;
+  const products = await Cart.find({ products: { $in: id } });
+  const total = products.length;
+  return res.status(200).json({
+    status: true,
+    message: "Find product using id in cart successfully!",
+    data: {
+      products: products,
+      total: total,
+    },
+  });
 };
 
-export default { allCart, addCart, cartByUser, updateCart, deleteCart };
+export default {
+  allCart,
+  addItemToCart,
+  cartByUser,
+  updateCart,
+  findProductInCart,
+};
