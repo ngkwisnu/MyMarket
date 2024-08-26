@@ -1,12 +1,15 @@
 import express from "express";
 import Outlet from "../controllers/Outlet.js";
+import { tokenVerify } from "../middleware/tokenVerify.js";
+import validateForm from "../middleware/validateForm.js";
 
 const router = express.Router();
+const middleware = [tokenVerify, validateForm.validateFormOutlet];
 
-router.get("/", Outlet.allOutlet);
-router.post("/", Outlet.addOutlet);
-router.put("/:id", Outlet.updateOutlet);
-router.get("/:id", Outlet.outletById);
-router.delete("/:id", Outlet.deleteOutlet);
+router.get("/", tokenVerify, Outlet.allOutlet);
+router.post("/", middleware, Outlet.addOutlet);
+router.put("/:id", middleware, Outlet.updateOutlet);
+router.get("/:id", tokenVerify, Outlet.outletById);
+router.delete("/:id", tokenVerify, Outlet.deleteOutlet);
 
 export default router;

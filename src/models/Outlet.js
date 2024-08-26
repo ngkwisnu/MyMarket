@@ -6,6 +6,12 @@ const outletSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    outlet_images: [
+      {
+        type: String,
+        default: null,
+      },
+    ],
     outlet_description: {
       type: String,
       required: true,
@@ -27,10 +33,12 @@ const outletSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    products: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-    },
+    products: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   { timestamps: true }
 );

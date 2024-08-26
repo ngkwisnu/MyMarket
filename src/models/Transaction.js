@@ -5,6 +5,10 @@ const transactionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  order_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Orders",
+  },
   transaction_date: {
     type: Date,
     required: true,
@@ -43,13 +47,17 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      qty: {
+        type: Number,
+        required: true,
+      },
       total_price: {
         type: Number,
         required: true,
       },
     },
   ],
-  product_outlet: {
+  outlet: {
     type: String,
     required: true,
   },
