@@ -26,6 +26,14 @@ const cartSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+cartSchema.pre("find", function () {
+  this.where({ deleted_at: null });
+});
+
+cartSchema.pre("findOne", function () {
+  this.where({ deleted_at: null });
+});
+
 const Cart = mongoose.model("Cart", cartSchema);
 
 export default Cart;
