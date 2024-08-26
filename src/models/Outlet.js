@@ -6,12 +6,10 @@ const outletSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    outlet_images: [
-      {
-        type: String,
-        default: null,
-      },
-    ],
+    outlet_image: {
+      type: String,
+      default: null,
+    },
     outlet_description: {
       type: String,
       required: true,
