@@ -78,9 +78,12 @@ const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) return res.sendStatus(404);
-    const result = await Product.findByIdAndUpdate(id, {
-      deleted_at: new Date(),
-    });
+    const result = await Product.findOneAndUpdate(
+      { _id: id },
+      {
+        deleted_at: new Date(),
+      }
+    );
     if (!result) return res.sendStatus(400);
     return res.status(200).json({
       status: 200,
