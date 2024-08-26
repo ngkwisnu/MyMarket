@@ -1,12 +1,13 @@
 import express from "express";
 import Orders from "../controllers/Orders.js";
 import { tokenVerify } from "../middleware/tokenVerify.js";
+import validateForm from "../middleware/validateForm.js";
 
 const router = express.Router();
 
 router.get("/", tokenVerify, Orders.allOrder);
 router.get("/user/", tokenVerify, Orders.orderByUser);
-router.post("/", tokenVerify, Orders.addOrder);
+router.post("/", tokenVerify, validateForm.validateFormOrder, Orders.addOrder);
 router.put("/:id", tokenVerify, Orders.updateOrder);
 router.delete("/:id", tokenVerify, Orders.deleteOrder);
 router.get("/:id", tokenVerify, Orders.orderById);
