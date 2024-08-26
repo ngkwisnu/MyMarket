@@ -11,6 +11,6 @@ router.put("/:id", tokenVerify, Orders.updateOrder);
 router.delete("/:id", tokenVerify, Orders.deleteOrder);
 router.get("/:id", tokenVerify, Orders.orderById);
 router.get("/product/:id", tokenVerify, Orders.orderByProduct);
-router.post("/data/midtrans", tokenVerify, Orders.insertTransaction);
+router.post("/data/midtrans", Orders.insertTransaction);
 
 export default router;

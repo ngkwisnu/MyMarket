@@ -11,17 +11,21 @@ let snap = new midtransClient.Snap({
 });
 
 const insertTransaction = async (req, res) => {
-  console.log("Masuk");
+  console.log("Transactions Load!");
   const result = await snap.transaction.notification(req.body);
   if (result.transaction_status !== "capture") {
-    await Order.findByIdAndUpdate(result.order_id, {
+    const order = await Order.findByIdAndUpdate(result.order_id, {
       status: result.transaction_status,
     });
+    await order.save();
     return res.status(400).json({
       status: false,
       message: result.status_message,
     });
   } else {
+    await Order.findByIdAndUpdate(result.order_id, {
+      status: result.transaction_status,
+    });
     const order = await Order.findById(result.order_id).populate("products");
     const outlet_id = [];
     order.products.forEach((el) => {
@@ -117,7 +121,7 @@ const orderByProduct = async (req, res) => {
 
 const addOrder = async (req, res) => {
   try {
-    const { address, payment_method, products } = req.body;
+    const { address, products } = req.body;
     const idprod = products.map((el) => el.product_id);
     const product = await Product.find({ _id: { $in: idprod } })
       .populate("outlet")
@@ -142,7 +146,6 @@ const addOrder = async (req, res) => {
       status: "waiting",
       transaction_date: new Date(),
       address: address,
-      payment_method: payment_method,
       products: detailsprod,
       total_amount: Math.round(total_amount),
     });
