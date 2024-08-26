@@ -15,18 +15,16 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const router = express.Router();
 
+const middleware = [
+  tokenVerify,
+  upload.single("image"),
+  validateForm.validateFormUser,
+];
+
 router.get("/", tokenVerify, User.allUser);
-router.post(
-  "/",
-  [tokenVerify, upload.single("image"), validateForm.validateFormUser],
-  User.addUser
-);
+router.post("/", middleware, User.addUser);
 router.get("/:id", tokenVerify, User.userById);
-router.put(
-  "/:id",
-  [tokenVerify, upload.single("image"), validateForm.validateFormUser],
-  User.updateUser
-);
+router.put("/:id", middleware, User.updateUser);
 router.delete("/:id", tokenVerify, User.deleteUser);
 
 export default router;

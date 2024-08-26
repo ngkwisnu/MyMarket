@@ -7,17 +7,13 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["success", "failed"],
+    default: "pending",
   },
   transaction_date: {
     type: Date,
     required: true,
   },
   address: {
-    type: String,
-    required: true,
-  },
-  payment_method: {
     type: String,
     required: true,
   },

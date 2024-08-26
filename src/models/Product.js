@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Rate from "./Cart.js";
 
 const productSchema = new mongoose.Schema(
   {
@@ -55,6 +56,10 @@ productSchema.pre("find", function () {
 
 productSchema.pre("findOne", function () {
   this.where({ deleted_at: null });
+});
+
+productSchema.post("findOneAndUpdate", async function () {
+  await Rate.deleteMany({ _id: { $in: this.rates } });
 });
 
 const Product = mongoose.model("Product", productSchema);

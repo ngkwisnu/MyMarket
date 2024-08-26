@@ -50,7 +50,7 @@ app.use("/user", User);
 app.use("/outlet", Outlet);
 app.use("/product", Product);
 app.use("/order", Order);
-// app.use("/cart", Cart);
+app.use("/cart", Cart);
 app.use("/likes", Likes);
 app.use("/favorites", Favorites);
 app.use("/transaction", Transaction);
